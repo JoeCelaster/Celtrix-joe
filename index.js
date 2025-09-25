@@ -20,7 +20,7 @@ function showBanner() {
 console.log("\n")
 
 async function askStackQuestions() {
-  return await inquirer.prompt([
+  const answers = await inquirer.prompt([
     {
       type: "list",
       name: "stack",
@@ -50,6 +50,8 @@ async function askStackQuestions() {
       default: "typescript",
     },
   ]);
+
+  return answers;
 }
 
 async function askProjectName() {

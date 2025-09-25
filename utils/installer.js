@@ -94,3 +94,66 @@ export function angularTailwindSetup(projectPath, config, projectName) {
     throw error;
   }
 }
+
+export function mernSetup(projectPath, config, projectName) {
+  logger.info("⚡ Setting up MERN...");
+
+  try {
+    // 1. Create MERN project
+    execSync(`npm create vite@latest client -- --template react`, {
+      cwd: projectPath,
+      stdio: "inherit",
+      shell: true,
+    });
+
+    const appJsxPath = path.join(projectPath, "client", "src", "App.jsx");
+    const appCssPath = path.join(projectPath,"client", "src", "index.css");
+
+    let appJsx = fs.readFileSync(appJsxPath, "utf-8");
+    const lines = appJsx.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes("</>")) {
+        // inject badge right after opening fragment
+        lines.splice(i, 0, `  <div className="powered-badge">Powered by <span className="celtrix">Celtrix</span></div>`);
+        break;
+      }
+    }
+
+    fs.writeFileSync(appJsxPath, lines.join("\n"), "utf-8");
+
+    // append CSS
+    const badgeCSS = `
+    .powered-badge {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      font-size: 0.875rem;
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                  0 4px 6px -2px rgba(0,0,0,0.05);
+      opacity: 0.8;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    .powered-badge:hover {
+      opacity: 1;
+    }
+
+    .powered-badge .celtrix {
+      font-weight: 600;
+      color: #4ade80;
+    }
+    `;
+
+    fs.appendFileSync(appCssPath, badgeCSS, "utf-8");
+
+    logger.info("✅ MERN project created successfully!");
+  } catch (error) {
+    logger.error("❌ Failed to set up MERN");
+    throw error;
+  }
+}
